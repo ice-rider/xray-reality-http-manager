@@ -108,8 +108,10 @@ func main() {
 	statsUseCase := stats.NewStatsUseCase(statsRepo)
 	statsHandler := http.NewStatsHandler(statsUseCase)
 	clientHandler := http.NewClientHandler(configUseCase)
+	mldsa65Handler := http.NewMldsa65Handler(configUseCase)
+	configHandler := http.NewServerConfigHandler(configUseCase)
 
-	server := http.NewServer(authHandler, clientHandler, statsHandler, authMiddleware, httpPort)
+	server := http.NewServer(authHandler, clientHandler, statsHandler, mldsa65Handler, configHandler, authMiddleware, httpPort)
 	if err := server.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "Ошибка HTTP сервера: %v\n", err)
 		os.Exit(1)
