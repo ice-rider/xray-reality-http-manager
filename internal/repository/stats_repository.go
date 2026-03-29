@@ -6,12 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
 	"xray_server/internal/domain"
 
 	stats "github.com/v2fly/v2ray-core/v5/app/stats/command"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type StatsRepositorygRPC struct {
@@ -21,11 +20,12 @@ type StatsRepositorygRPC struct {
 }
 
 func NewStatsRepositorygRPC(endpoint string) (*StatsRepositorygRPC, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	conn, err := grpc.DialContext(ctx, endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Xray API: %w", err)
@@ -45,20 +45,15 @@ func (r *StatsRepositorygRPC) Close() error {
 }
 
 func (r *StatsRepositorygRPC) GetTrafficStats(email string) (*domain.UserTraffic, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
 	allStats, err := r.GetAllTrafficStats()
 	if err != nil {
 		return nil, err
 	}
-
 	for _, stat := range allStats {
 		if stat.Email == email {
 			return &stat, nil
 		}
 	}
-
 	return nil, nil
 }
 
@@ -77,22 +72,18 @@ func (r *StatsRepositorygRPC) GetAllTrafficStats() ([]domain.UserTraffic, error)
 	}
 
 	userStats := make(map[string]*domain.UserTraffic)
-
 	for _, stat := range resp.GetStat() {
 		name := stat.GetName()
 		value := stat.GetValue()
-
 		email := extractEmailFromStatName(name)
 		if email == "" {
 			continue
 		}
-
 		if _, exists := userStats[email]; !exists {
 			userStats[email] = &domain.UserTraffic{
 				Email: email,
 			}
 		}
-
 		if isUplink(name) {
 			userStats[email].Uplink = value
 		} else if isDownlink(name) {
@@ -104,7 +95,6 @@ func (r *StatsRepositorygRPC) GetAllTrafficStats() ([]domain.UserTraffic, error)
 	for _, s := range userStats {
 		result = append(result, *s)
 	}
-
 	return result, nil
 }
 
@@ -113,12 +103,10 @@ func extractEmailFromStatName(name string) string {
 	if len(name) <= start {
 		return ""
 	}
-
 	end := findSubstring(name, ">>>traffic>>>", start)
 	if end == -1 {
 		return ""
 	}
-
 	return name[start:end]
 }
 

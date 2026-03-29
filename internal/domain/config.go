@@ -11,6 +11,17 @@ type Config struct {
 	Api       Api           `json:"api"`
 	Stats     Stats         `json:"stats"`
 	Policy    Policy        `json:"policy"`
+	Routing   Routing       `json:"routing"`
+}
+
+type Routing struct {
+	Rules []RoutingRule `json:"rules"`
+}
+
+type RoutingRule struct {
+	Type        string   `json:"type"`
+	InboundTag  []string `json:"inboundTag"`
+	OutboundTag string   `json:"outboundTag"`
 }
 
 type ApiInbound struct {

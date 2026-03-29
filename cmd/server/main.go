@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"time"
 
@@ -84,6 +85,16 @@ func main() {
 		xrayAPIEndpoint = "xray:54321"
 	}
 
+	fmt.Printf("[DEBUG] Подключение к Xray API: %s\n", xrayAPIEndpoint)
+	conn, err := net.DialTimeout("tcp", xrayAPIEndpoint, 5*time.Second)
+	if err != nil {
+		fmt.Printf("[ERROR] Xray API недоступен: %v\n", err)
+		fmt.Println("[INFO] Убедитесь что Xray запущен и слушает порт 54321")
+		return
+	}
+	conn.Close()
+	fmt.Println("[DEBUG] Xray API доступен, подключаюсь...")
+
 	statsRepo, err := repository.NewStatsRepositorygRPC(xrayAPIEndpoint)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Ошибка инициализации сервиса статистики: %v\n", err)
@@ -103,4 +114,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Ошибка HTTP сервера: %v\n", err)
 		os.Exit(1)
 	}
+
+	fmt.Println("[INFO] Сервер запущен на порту 8080")
 }

@@ -69,6 +69,15 @@ func NewConfigUseCase(opts ConfigOptions) *ConfigUseCase {
 				"0": {StatsUserUplink: true, StatsUserDownlink: true},
 			},
 		},
+		Routing: domain.Routing{
+			Rules: []domain.RoutingRule{
+				{
+					Type:        "field", // без этого xray молча игнорирует правило
+					InboundTag:  []string{"api"},
+					OutboundTag: "api",
+				},
+			},
+		},
 	}
 
 	return &ConfigUseCase{
@@ -87,14 +96,11 @@ type AddClientInput struct {
 func (uc *ConfigUseCase) AddClient(input AddClientInput) error {
 	uc.mu.Lock()
 	defer uc.mu.Unlock()
-
 	client := domain.Client{ID: input.ID, Flow: input.Flow, Email: input.Email}
-
 	if inbound, ok := uc.config.Inbounds[0].(domain.Inbound); ok {
 		inbound.Settings.Clients = append(inbound.Settings.Clients, client)
 		uc.config.Inbounds[0] = inbound
 	}
-
 	return uc.saveConfig()
 }
 
