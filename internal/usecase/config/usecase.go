@@ -57,7 +57,7 @@ func NewConfigUseCase(opts ConfigOptions) *ConfigUseCase {
 				Listen:   "0.0.0.0",
 				Port:     54321,
 				Protocol: "dokodemo-door",
-				Settings: domain.ApiInboundSettings{Address: "0.0.0.0"},
+				Settings: domain.ApiInboundSettings{Address: "127.0.0.1"},
 				Tag:      "api",
 			},
 		},
@@ -158,7 +158,7 @@ func parseShortIds(raw string) []string {
 	if raw == "" {
 		return []string{}
 	}
-	result := []string{}
+	var result []string
 	start := 0
 	for i, r := range raw {
 		if r == ',' || r == ' ' {

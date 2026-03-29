@@ -9,8 +9,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	stats "github.com/v2fly/v2ray-core/v5/app/stats/command"
 	"xray_server/internal/domain"
+
+	stats "github.com/v2fly/v2ray-core/v5/app/stats/command"
 )
 
 type StatsRepositorygRPC struct {
@@ -25,7 +26,6 @@ func NewStatsRepositorygRPC(endpoint string) (*StatsRepositorygRPC, error) {
 
 	conn, err := grpc.DialContext(ctx, endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Xray API: %w", err)
