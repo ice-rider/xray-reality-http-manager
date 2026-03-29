@@ -1,0 +1,74 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "listen": "0.0.0.0",
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "4e473521-b0c4-494d-a870-d95e84d5c9eb",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.apple.com:443",
+          "xver": 0,
+          "serverNames": [
+            "www.apple.com"
+          ],
+          "privateKey": "test123",
+          "publicKey": "test456",
+          "shortIds": [
+            "abc123",
+            "def456"
+          ],
+          "fingerprint": "firefox",
+          "mldsa65Seed": "seed789",
+          "mldsa65Public": "mldsa000"
+        }
+      }
+    },
+    {
+      "listen": "127.0.0.1",
+      "port": 54321,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "127.0.0.1"
+      },
+      "tag": "api"
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    }
+  ],
+  "api": {
+    "tag": "api",
+    "services": [
+      "HandlerService",
+      "LoggerService",
+      "StatsService"
+    ]
+  },
+  "stats": {},
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserUplink": true,
+        "statsUserDownlink": true
+      }
+    }
+  }
+}

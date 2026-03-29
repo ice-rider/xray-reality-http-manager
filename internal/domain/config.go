@@ -1,12 +1,32 @@
 package domain
 
+type InboundBase interface {
+	GetTag() string
+}
+
 type Config struct {
-	Log       Log        `json:"log"`
-	Inbounds  []Inbound  `json:"inbounds"`
-	Outbounds []Outbound `json:"outbounds"`
-	Api       Api        `json:"api"`
-	Stats     Stats      `json:"stats"`
-	Policy    Policy     `json:"policy"`
+	Log       Log           `json:"log"`
+	Inbounds  []InboundBase `json:"inbounds"`
+	Outbounds []Outbound    `json:"outbounds"`
+	Api       Api           `json:"api"`
+	Stats     Stats         `json:"stats"`
+	Policy    Policy        `json:"policy"`
+}
+
+type ApiInbound struct {
+	Listen   string             `json:"listen"`
+	Port     int                `json:"port"`
+	Protocol string             `json:"protocol"`
+	Settings ApiInboundSettings `json:"settings"`
+	Tag      string             `json:"tag"`
+}
+
+func (a ApiInbound) GetTag() string {
+	return a.Tag
+}
+
+type ApiInboundSettings struct {
+	Address string `json:"address"`
 }
 
 type Log struct {
@@ -19,6 +39,11 @@ type Inbound struct {
 	Protocol       string         `json:"protocol"`
 	Settings       Settings       `json:"settings"`
 	StreamSettings StreamSettings `json:"streamSettings"`
+	Tag            string         `json:"tag,omitempty"`
+}
+
+func (i Inbound) GetTag() string {
+	return i.Tag
 }
 
 type Settings struct {
@@ -27,8 +52,9 @@ type Settings struct {
 }
 
 type Client struct {
-	ID   string `json:"id"`
-	Flow string `json:"flow"`
+	ID    string `json:"id"`
+	Flow  string `json:"flow"`
+	Email string `json:"email,omitempty"`
 }
 
 type StreamSettings struct {
@@ -46,7 +72,7 @@ type RealitySettings struct {
 	PublicKey     string   `json:"publicKey"`
 	ShortIds      []string `json:"shortIds"`
 	Fingerprint   string   `json:"fingerprint"`
-	Mldsa65Sign   string   `json:"mldsa65Sign"`
+	Mldsa65Seed   string   `json:"mldsa65Seed"`
 	Mldsa65Public string   `json:"mldsa65Public"`
 }
 
@@ -69,4 +95,14 @@ type Policy struct {
 type PolicyLevel0 struct {
 	StatsUserUplink   bool `json:"statsUserUplink"`
 	StatsUserDownlink bool `json:"statsUserDownlink"`
+}
+
+type ConfigRepository interface {
+	Save(config *Config) error
+	AddClient(client Client) error
+	GetClients() []Client
+	GetServerIP() string
+	GetPublicKey() string
+	GetMldsa65Public() string
+	GetShortIds() []string
 }

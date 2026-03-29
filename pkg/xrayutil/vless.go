@@ -1,11 +1,10 @@
-package xray
+package xrayutil
 
 import (
 	"fmt"
 	"net/url"
 )
 
-// VlessLinkParams параметры для генерации VLESS ссылки
 type VlessLinkParams struct {
 	UUID        string
 	ServerIP    string
@@ -19,8 +18,6 @@ type VlessLinkParams struct {
 	ClientName  string
 }
 
-// GenerateVlessLink генерирует VLESS ссылку в формате:
-// vless://uuid@ip:port?encryption=none&flow=...&security=reality&sni=...&fp=...&pbk=...&sid=...&pqv=...#name
 func GenerateVlessLink(params VlessLinkParams) string {
 	query := url.Values{}
 	query.Set("encryption", "none")
