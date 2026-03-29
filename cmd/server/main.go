@@ -20,7 +20,6 @@ const (
 	defaultConfigPath = "config.json"
 	httpPort          = 8080
 	dbPath            = "users.db"
-	xrayAPIEndpoint   = "127.0.0.1:54321"
 )
 
 func main() {
@@ -79,6 +78,11 @@ func main() {
 	loginUseCase := auth.NewLoginUseCase(userRepo, jwtService)
 	authHandler := http.NewAuthHandler(loginUseCase)
 	authMiddleware := http.NewAuthMiddleware(jwtService)
+
+	xrayAPIEndpoint := os.Getenv("XRAY_API_ENDPOINT")
+	if xrayAPIEndpoint == "" {
+		xrayAPIEndpoint = "xray:54321"
+	}
 
 	statsRepo, err := repository.NewStatsRepositorygRPC(xrayAPIEndpoint)
 	if err != nil {
